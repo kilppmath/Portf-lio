@@ -14,12 +14,12 @@ function AssetCard({ asset }) {
       <div className="flex items-center justify-between">
         <span className="text-xs font-mono text-text-muted uppercase tracking-wider">{asset.name}</span>
         <span className={`text-xs font-mono px-1.5 py-0.5 rounded ${isUp ? "bg-bull/10 text-bull" : "bg-bear/10 text-bear"}`}>
-          {isUp ? "+" : ""}{asset.change.toFixed(2)}%
+          {isUp ? "+" : ""}{asset?.change?.toFixed(2) ?? "0.00"}%
         </span>
       </div>
       <div className="font-mono text-xl text-text-primary font-medium">
         {asset.id === "usdbrl" ? "R$ " : asset.id === "bitcoin" || asset.id === "ibovespa" ? "" : "R$ "}
-        {formatValue(asset)}
+        {asset?.value !== undefined ? formatValue(asset) : "0,00"}
       </div>
       <div className="text-xs text-text-muted">
         {asset.type === "index" ? "Índice" : asset.type === "forex" ? "Câmbio" : asset.type === "crypto" ? "Cripto" : "Ação"}
@@ -47,7 +47,7 @@ export default function MarketTicker() {
 
   return (
     <div className="flex gap-3 overflow-x-auto pb-2 animate-stagger">
-      {data?.assets.map((asset) => (
+      {data?.assets?.map((asset) => (
         <AssetCard key={asset.id} asset={asset} />
       ))}
     </div>

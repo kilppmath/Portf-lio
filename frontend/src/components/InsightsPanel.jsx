@@ -10,7 +10,7 @@ function InsightCard({ item }) {
         <div className="flex items-center gap-2 mb-1">
           <span className="text-xs font-mono text-text-muted">{item.assetName}</span>
           <span className={`text-xs font-mono ${isUp ? "text-bull" : "text-bear"}`}>
-            {isUp ? "+" : ""}{item.change.toFixed(2)}%
+            {isUp ? "+" : ""}{item?.change?.toFixed(2) ?? "0.00"}%
           </span>
         </div>
         <p className="text-sm text-text-secondary leading-relaxed">{item.insight}</p>
@@ -49,7 +49,7 @@ export default function InsightsPanel() {
 
           {/* Por ativo */}
           <div className="space-y-2 animate-stagger">
-            {data?.assets.map((item) => (
+            {data?.assets?.map((item) => (
               <InsightCard key={item.assetId} item={item} />
             ))}
           </div>
