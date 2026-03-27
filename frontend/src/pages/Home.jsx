@@ -48,7 +48,7 @@ export default function Home() {
               Portfólio & Análise Financeira
             </p>
             <h1 className="font-display text-5xl lg:text-6xl text-text-primary leading-tight mb-4">
-              Seu Nome<span className="text-accent-blue">.</span>
+              Matheus Kilpp Nogueira<span className="text-accent-blue">.</span>
             </h1>
             <p className="text-text-secondary text-lg leading-relaxed max-w-md">
               Desenvolvedor e analista de dados com foco em finanças quantitativas,
