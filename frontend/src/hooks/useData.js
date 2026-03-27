@@ -1,22 +1,7 @@
-// hooks/useData.js
 import { useState, useEffect, useCallback } from "react";
-import axios from "axios";
+import { getMarketData, getHistoricalData, getInsights, sendChat } from "../services/api";
 
-// URL base da API (Vercel e Render)
-const API_URL = import.meta.env.VITE_API_URL || "https://portf-lio-ue9u.onrender.com";
-
-const api = axios.create({
-  baseURL: API_URL,
-  timeout: 8000,
-});
-
-// -------------------- Serviços --------------------
-export const getMarketData = () => api.get("/api/market").then((r) => r.data);
-export const getHistoricalData = (id) => api.get(`/api/market/history/${id}`).then((r) => r.data);
-export const getInsights = () => api.get("/api/insights").then((r) => r.data);
-export const sendChat = (message) => api.post("/api/chat", { message }).then((r) => r.data);
-
-// -------------------- Hook: Market --------------------
+// Hook para dados de mercado
 export function useMarket(interval = 60000) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -43,7 +28,7 @@ export function useMarket(interval = 60000) {
   return { data, loading, error, refetch: fetch };
 }
 
-// -------------------- Hook: Histórico --------------------
+// Hook para histórico de preços
 export function useHistory(assetId) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -59,7 +44,7 @@ export function useHistory(assetId) {
   return { data, loading };
 }
 
-// -------------------- Hook: Insights --------------------
+// Hook para insights
 export function useInsights() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -73,7 +58,7 @@ export function useInsights() {
   return { data, loading };
 }
 
-// -------------------- Hook: Chatbot --------------------
+// Hook para o chatbot mentor
 export function useChat() {
   const [messages, setMessages] = useState([
     {
@@ -109,5 +94,3 @@ export function useChat() {
 
   return { messages, send, loading };
 }
-
-export default api;
