@@ -62,7 +62,7 @@ export default function About() {
           <p className="text-xs font-mono text-accent-blue uppercase tracking-widest mb-3">Sobre</p>
           <h1 className="font-display text-5xl text-text-primary mb-6">
             Olá, sou<br />
-            <span className="italic">Seu Nome</span>
+            <span className="italic">Matheus Kilpp</span>
             <span className="text-accent-blue">.</span>
           </h1>
           <div className="space-y-4 text-text-secondary leading-relaxed">
@@ -105,9 +105,9 @@ export default function About() {
             <h3 className="text-xs font-mono text-text-muted uppercase tracking-wider mb-3">Contato</h3>
             <div className="space-y-2">
               {[
-                { label: "Email", value: "seuemail@exemplo.com", href: "mailto:seuemail@exemplo.com" },
-                { label: "LinkedIn", value: "linkedin.com/in/seuperfil", href: "#" },
-                { label: "GitHub", value: "github.com/seuperfil", href: "#" },
+                { label: "Email", value: "matheuskilpp7@gmail.com", href: "mailto:matheuskilpp7@gmail.com" },
+                { label: "LinkedIn", value: "linkedin.com/in/matheuskilpp", href: "https://linkedin.com/in/matheuskilpp" },
+                { label: "GitHub", value: "github.com/matheuskilpp", href: "https://github.com/matheuskilpp" },
               ].map(({ label, value, href }) => (
                 <div key={label} className="flex justify-between items-center text-sm">
                   <span className="text-text-muted font-mono text-xs">{label}</span>
