@@ -2,69 +2,110 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Base ───────────────────────────────────────────────────────────── */
 @layer base {
-  * {
-    box-sizing: border-box;
-  }
+  *, *::before, *::after { box-sizing: border-box; }
 
-  html {
-    scroll-behavior: smooth;
-  }
+  html { scroll-behavior: smooth; }
 
   body {
     background-color: #0B0B0F;
     color: #F0F0F5;
     font-family: 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
+  ::selection {
+    background: rgba(59,130,246,0.25);
+    color: #fff;
+  }
+
+  /* Scrollbar antigo */
   ::-webkit-scrollbar {
     width: 4px;
   }
-
   ::-webkit-scrollbar-track {
     background: #0B0B0F;
   }
-
   ::-webkit-scrollbar-thumb {
     background: #1E1E2A;
     border-radius: 2px;
   }
+
+  /* Ruído de fundo leve (opcional) */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    opacity: 0.15;
+  }
+
+  #root { position: relative; z-index: 1; }
 }
 
+/* ─── Components ──────────────────────────────────────────────────────── */
 @layer components {
+  /* Cards */
   .card {
     @apply bg-bg-card border border-bg-border rounded-2xl;
   }
-
-  .tag {
-    @apply text-xs font-mono px-2 py-0.5 rounded bg-bg-border text-text-secondary;
+  .card-hi {
+    @apply bg-surface-3 border border-surface-border-hi rounded-2xl;
+  }
+  .card-glow {
+    transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  .card-glow:hover {
+    box-shadow: 0 0 0 1px rgba(59,130,246,0.18), 0 8px 32px rgba(0,0,0,0.4);
+    border-color: rgba(59,130,246,0.2);
   }
 
-  .glow-blue {
-    box-shadow: 0 0 40px rgba(59, 130, 246, 0.08);
+  /* Labels */
+  .label {
+    @apply text-xs font-mono text-text-muted uppercase tracking-widest;
   }
 
+  /* Pills / Tags */
+  .pill {
+    @apply text-xs font-mono px-2 py-0.5 rounded bg-bg-border text-text-secondary border border-bg-border;
+  }
+
+  /* Divider (para modal e separações) */
+  .divider {
+    @apply border-t border-bg-border;
+  }
+
+  /* Section heading */
   .section-title {
     @apply font-display text-2xl text-text-primary mb-1;
   }
-
   .section-sub {
     @apply text-sm text-text-secondary mb-6;
   }
 }
 
-/* Animação de entrada escalonada */
-.animate-stagger > * {
+/* ─── Animações de entrada ─────────────────────────────────────────────── */
+.animate-stagger > *,
+.stagger > * {
   opacity: 0;
   animation: fadeUp 0.5s ease forwards;
 }
-
-.animate-stagger > *:nth-child(1) { animation-delay: 0.05s; }
-.animate-stagger > *:nth-child(2) { animation-delay: 0.1s; }
-.animate-stagger > *:nth-child(3) { animation-delay: 0.15s; }
-.animate-stagger > *:nth-child(4) { animation-delay: 0.2s; }
-.animate-stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.animate-stagger > *:nth-child(1),
+.stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.animate-stagger > *:nth-child(2),
+.stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.animate-stagger > *:nth-child(3),
+.stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.animate-stagger > *:nth-child(4),
+.stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.animate-stagger > *:nth-child(5),
+.stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.animate-stagger > *:nth-child(6),
+.stagger > *:nth-child(6) { animation-delay: 0.3s; }
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(14px); }

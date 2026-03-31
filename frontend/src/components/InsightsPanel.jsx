@@ -1,60 +1,69 @@
-import { useInsights } from "../hooks/useData";
-
-function InsightCard({ item }) {
-  const isUp = item.sentiment === "bullish";
-  return (
-    <div className="card p-4 flex gap-3 items-start">
-      {/* Indicador */}
-      <div className={`mt-0.5 w-2 h-2 rounded-full flex-shrink-0 ${isUp ? "bg-bull" : "bg-bear"}`} />
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <span className="text-xs font-mono text-text-muted">{item.assetName}</span>
-          <span className={`text-xs font-mono ${isUp ? "text-bull" : "text-bear"}`}>
-            {isUp ? "+" : ""}{item?.change?.toFixed(2) ?? "0.00"}%
-          </span>
-        </div>
-        <p className="text-sm text-text-secondary leading-relaxed">{item.insight}</p>
-      </div>
-    </div>
-  );
-}
+import { getVolatility, generateInsight, generateOverallInsight } from "../utils/marketAnalysis";
 
 export default function InsightsPanel() {
-  const { data, loading } = useInsights();
+  const DATA = [
+    {
+      name: "IBOVESPA",
+      change: -0.05,
+      text: "Mercado segue sem direção clara, com leve pressão vendedora.",
+    },
+    {
+      name: "USD/BRL",
+      change: 0.0,
+      text: "Câmbio lateral aguardando novos dados macroeconômicos.",
+    },
+    {
+      name: "Bitcoin",
+      change: -2.41,
+      text: "Alta volatilidade mantém comportamento especulativo.",
+    },
+    {
+      name: "PETR4",
+      change: -1.32,
+      text: "Correção após movimento anterior, possível realização.",
+    },
+    {
+      name: "VALE3",
+      change: -1.74,
+      text: "Pressão vendedora influenciada pelo cenário externo.",
+    },
+  ];
+  const overall = generateOverallInsight(DATA);
 
   return (
-    <div>
-      <h3 className="section-title">Insights Automáticos</h3>
-      <p className="section-sub">Análise baseada em variação de mercado</p>
+    <div className="space-y-3">
 
-      {loading ? (
-        <div className="space-y-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="card p-4 h-16 animate-pulse" />
-          ))}
-        </div>
-      ) : (
-        <>
-          {/* Insight geral */}
-          {data?.overall && (
-            <div
-              className={`card p-4 mb-4 border-l-2 ${
-                data.overall.sentiment === "bullish" ? "border-bull" : "border-bear"
-              }`}
-            >
-              <span className="text-xs font-mono text-text-muted mb-1 block">VISÃO GERAL</span>
-              <p className="text-sm text-text-primary">{data.overall.insight}</p>
+      {/* VISÃO GERAL */}
+      <div className="card p-5 border border-red-500/40">
+        <p className="label mb-2">Visão Geral</p>
+        <p className="text-sm text-content-md leading-relaxed">
+          {overall}
+        </p>
+      </div>
+
+      {/* INSIGHTS GERAIS */}
+      {DATA.map((item) => {
+        const volatility = getVolatility(item.change);
+        const isUp = item.change >= 0;
+
+        return (
+          <div key={item.name} className="card p-4">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-xs font-mono text-content-lo">
+                {item.name}
+              </span>
+              <span className={`text-xs font-mono ${isUp ? "text-bull" : "text-bear"}`}>
+                {isUp ? "+" : ""}
+                {item.change.toFixed(2)}%
+              </span>
             </div>
-          )}
 
-          {/* Por ativo */}
-          <div className="space-y-2 animate-stagger">
-            {data?.assets?.map((item) => (
-              <InsightCard key={item.assetId} item={item} />
-            ))}
+            <p className="text-sm text-content-md">
+  {generateInsight(item.name, item.change)} • Volatilidade: {volatility}
+</p>
           </div>
-        </>
-      )}
+        );
+      })}
     </div>
   );
 }

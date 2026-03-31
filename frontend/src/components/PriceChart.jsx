@@ -1,50 +1,90 @@
-import { useState } from "react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
+
+import { useState, useEffect } from "react";
+import {
+  AreaChart, Area, XAxis, YAxis, Tooltip,
+  ResponsiveContainer, CartesianGrid,
+} from "recharts";
 import { useHistory } from "../hooks/useData";
+import { analyzeMarket } from "../utils/marketAnalysis"; // ✅ IMPORTANTE
 
 const ASSETS = [
-  { id: "ibovespa", label: "IBOVESPA" },
+  { id: "ibovespa", label: "IBOV" },
   { id: "usdbrl", label: "USD/BRL" },
-  { id: "bitcoin", label: "Bitcoin" },
+  { id: "bitcoin", label: "BTC" },
   { id: "petr4", label: "PETR4" },
   { id: "vale3", label: "VALE3" },
 ];
 
-// Tooltip customizado
-function CustomTooltip({ active, payload, label }) {
+function ChartTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
+
+  const val = payload?.[0]?.value ?? 0;
+
   return (
-    <div className="card px-3 py-2 text-xs font-mono">
-      <div className="text-text-muted mb-1">{label}</div>
-      <div className="text-accent-blue font-medium">
-        {Number(payload[0].value).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
-      </div>
+    <div className="bg-surface-3 border border-surface-border-hi rounded-xl px-3 py-2">
+      <p className="font-mono text-2xs text-content-lo mb-1">{label}</p>
+      <p className="font-mono text-sm text-content-hi font-medium">
+        {Number(val).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}
+      </p>
     </div>
   );
 }
 
-export default function PriceChart() {
+// ✅ AGORA RECEBE onAssetData DO HOME
+export default function PriceChart({ onAssetData }) {
   const [selected, setSelected] = useState("ibovespa");
   const { data, loading } = useHistory(selected);
 
+  const points = Array.isArray(data?.data) ? data.data : [];
+
+  const first = points.length > 0 ? points[0]?.value ?? 0 : 0;
+  const last = points.length > 0 ? points[points.length - 1]?.value ?? 0 : 0;
+
+  const pct =
+    points.length > 1 && first !== 0
+      ? ((last / first - 1) * 100)
+      : null;
+
+  const isUp = pct !== null && pct >= 0;
+
+  // ✅ AQUI ESTÁ A MÁGICA (SEM QUEBRAR NADA)
+  useEffect(() => {
+    if (!points.length) return;
+
+    const analysis = analyzeMarket(points);
+
+    if (onAssetData) {
+      onAssetData(analysis);
+    }
+  }, [points, selected]);
+
   return (
-    <div className="card p-6">
+    <div className="card p-6 flex flex-col gap-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h3 className="section-title">Histórico de Preços</h3>
-          <p className="section-sub">Últimos 30 dias — dados simulados</p>
+          <p className="label mb-1.5">Histórico de Preços</p>
+          <div className="flex items-baseline gap-3">
+            <span className="font-display text-2xl font-semibold text-content-hi">
+              {ASSETS.find((a) => a.id === selected)?.label}
+            </span>
+            {pct !== null && (
+              <span className={`font-mono text-sm font-medium ${isUp ? "text-bull" : "text-bear"}`}>
+                {isUp ? "+" : ""}{pct.toFixed(2)}% <span className="text-content-lo font-normal">30d</span>
+              </span>
+            )}
+          </div>
         </div>
-        {/* Seletor de ativo */}
+
         <div className="flex gap-1 flex-wrap">
           {ASSETS.map((a) => (
             <button
               key={a.id}
               onClick={() => setSelected(a.id)}
-              className={`text-xs font-mono px-3 py-1 rounded-lg transition-all ${
+              className={`font-mono text-2xs px-3 py-1.5 rounded-lg transition-all duration-150 ${
                 selected === a.id
-                  ? "bg-accent-blue text-white"
-                  : "bg-bg-border text-text-secondary hover:text-text-primary"
+                  ? "bg-blue text-white"
+                  : "bg-surface-3 text-content-md hover:text-content-hi border border-surface-border"
               }`}
             >
               {a.label}
@@ -55,38 +95,42 @@ export default function PriceChart() {
 
       {/* Gráfico */}
       {loading ? (
-        <div className="h-[240px] flex items-center justify-center text-text-muted text-sm font-mono">
-          Carregando...
+        <div className="h-56 flex items-center justify-center">
+          <span className="font-mono text-xs text-content-lo animate-pulse">Carregando dados...</span>
+        </div>
+      ) : points.length === 0 ? (
+        <div className="h-56 flex items-center justify-center text-content-lo font-mono text-xs">
+          Sem dados disponíveis
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={240}>
-          <LineChart data={data?.data || []} margin={{ top: 4, right: 8, bottom: 0, left: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1E1E2A" vertical={false} />
+        <ResponsiveContainer width="100%" height={220}>
+          <AreaChart data={points}>
+            <CartesianGrid stroke="#1C1E27" vertical={false} />
+
             <XAxis
               dataKey="date"
-              tick={{ fill: "#55556A", fontSize: 10, fontFamily: "JetBrains Mono" }}
+              tick={{ fill: "#4A4D60", fontSize: 10 }}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(v) => v.slice(5)} // mostra MM-DD
-              interval="preserveStartEnd"
+              tickFormatter={(v) => v?.slice?.(5) ?? ""}
             />
+
             <YAxis
-              tick={{ fill: "#55556A", fontSize: 10, fontFamily: "JetBrains Mono" }}
+              tick={{ fill: "#4A4D60", fontSize: 10 }}
               tickLine={false}
               axisLine={false}
-              width={70}
-              tickFormatter={(v) => v.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}
             />
-            <Tooltip content={<CustomTooltip />} />
-            <Line
+
+            <Tooltip content={<ChartTooltip />} />
+
+            <Area
               type="monotone"
               dataKey="value"
-              stroke="#3B82F6"
-              strokeWidth={2}
+              stroke={isUp ? "#22C55E" : "#F43F5E"}
+              fillOpacity={0.1}
               dot={false}
-              activeDot={{ r: 4, fill: "#3B82F6", stroke: "#0B0B0F", strokeWidth: 2 }}
             />
-          </LineChart>
+          </AreaChart>
         </ResponsiveContainer>
       )}
     </div>
